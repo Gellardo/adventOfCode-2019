@@ -1,7 +1,5 @@
 extern crate advent_of_code;
 
-use std::fs;
-
 use advent_of_code::intcode;
 
 fn main() {
