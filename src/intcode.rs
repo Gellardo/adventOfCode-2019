@@ -93,7 +93,8 @@ pub fn perform_step(state: &mut State, op_map: &HashMap<i32, Box<dyn Fn(&mut Sta
     return true; // continue
 }
 
-fn run_until_halt(memory: Vec<i32>, input_buffer: Vec<i32>) -> State {
+fn run_until_halt(memory: Vec<i32>, mut input_buffer: Vec<i32>) -> State {
+    input_buffer.reverse();
     let mut state = State { mem: memory, ip: 0, input: input_buffer, output: Vec::new() };
     let op_map = get_op_map();
 
@@ -103,8 +104,9 @@ fn run_until_halt(memory: Vec<i32>, input_buffer: Vec<i32>) -> State {
     return state;
 }
 
-pub fn run(memory: Vec<i32>, input_buffer: Vec<i32>) {
-    run_until_halt(memory, input_buffer);
+pub fn run(memory: Vec<i32>, input_buffer: Vec<i32>) -> Vec<i32> {
+    let state = run_until_halt(memory, input_buffer);
+    return state.output;
 }
 
 #[cfg(test)]
