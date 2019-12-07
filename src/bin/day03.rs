@@ -1,30 +1,30 @@
-use std::io;
-use std::collections::HashSet;
 use std::cmp::min;
+use std::collections::HashSet;
+use std::io;
 
-fn step(p: (i32,i32), s: String) -> (i32,i32) {
+fn step(p: (i32, i32), s: String) -> (i32, i32) {
     if s == "U" {
-        return (p.0, p.1+1)
+        return (p.0, p.1 + 1);
     }
     if s == "D" {
-        return (p.0, p.1-1)
+        return (p.0, p.1 - 1);
     }
     if s == "L" {
-        return (p.0-1, p.1)
+        return (p.0 - 1, p.1);
     }
     if s == "R" {
-        return (p.0+1, p.1)
+        return (p.0 + 1, p.1);
     }
-    return (0,0)
+    return (0, 0);
 }
 
-fn walk_wire(wire: &String) -> HashSet<(i32,i32)>{
+fn walk_wire(wire: &String) -> HashSet<(i32, i32)> {
     let line = wire.trim().split(",");
-    let mut current = (0,0);
+    let mut current = (0, 0);
     let mut points = HashSet::new();
     for op in line {
         //print!("{:?}",&op[..1]);
-        for _ in 0..op[1..].parse().unwrap(){
+        for _ in 0..op[1..].parse().unwrap() {
             //print!(".");
             current = step(current, op[..1].to_string());
             points.insert(current);
@@ -34,12 +34,12 @@ fn walk_wire(wire: &String) -> HashSet<(i32,i32)>{
     return points;
 }
 
-fn find_distance_closest_intersection(wire1: &String, wire2: &String) -> i32{
+fn find_distance_closest_intersection(wire1: &String, wire2: &String) -> i32 {
     let p1 = walk_wire(wire1);
     let p2 = walk_wire(wire2);
     let intersections = p1.intersection(&p2);
     let mut min_distance = i32::max_value();
-    for (x,y) in intersections {
+    for (x, y) in intersections {
         let distance = x.abs() + y.abs();
         min_distance = min(min_distance, distance)
     }

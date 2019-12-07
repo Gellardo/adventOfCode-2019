@@ -1,7 +1,8 @@
 extern crate advent_of_code;
 
-use advent_of_code::intcode;
 use std::fs;
+
+use advent_of_code::intcode;
 
 fn main() {
     let line = fs::read_to_string("inputs/day05").unwrap();
