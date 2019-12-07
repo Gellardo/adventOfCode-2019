@@ -6,7 +6,6 @@ use advent_of_code::intcode;
 
 fn run_amplifier(mem: Vec<i32>, phase_setting: i32, input: i32) -> i32 {
     let output = intcode::run(mem, vec![phase_setting, input]);
-    println!("output {:?}", output);
     return output[0];
 }
 
@@ -14,7 +13,6 @@ fn run_amplifiers(mem: Vec<i32>, phase_settings: Vec<i32>) -> i32 {
     let mut input = 0;
     for phase_setting in phase_settings {
         input = run_amplifier(mem.clone(), phase_setting, input);
-        println!("intermediate output {}", input);
     }
     return input;
 }
@@ -55,9 +53,7 @@ fn max_thrust(mem: Vec<i32>) -> (Vec<i32>, i32) {
 }
 
 fn main() {
-    let line = fs::read_to_string("inputs/day07").unwrap();
-    let memory: Vec<i32> = line.split(",").map(|x| x.trim()).map(|x| x.parse().unwrap()).collect();
-
+    let memory = intcode::read_program("inputs/day07".to_string());
 
     println!("{:?}", max_thrust(memory));
     println!("day 7 part 1: done");

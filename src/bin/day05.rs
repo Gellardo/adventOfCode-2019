@@ -5,8 +5,7 @@ use std::fs;
 use advent_of_code::intcode;
 
 fn main() {
-    let line = fs::read_to_string("inputs/day05").unwrap();
-    let memory: Vec<i32> = line.split(",").map(|x| x.trim()).map(|x| x.parse().unwrap()).collect();
+    let memory = intcode::read_program("inputs/day05".to_string());
     intcode::run(memory.clone(), vec![1]);
     println!("day 5 part 1: done");
 

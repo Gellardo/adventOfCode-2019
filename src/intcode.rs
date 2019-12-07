@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::convert::TryInto;
+use std::fs;
 
 pub struct State {
     mem: Vec<i32>,
@@ -75,12 +76,11 @@ fn input(state: &mut State) -> i32 {
 
 fn output(state: &mut State, value: i32) {
     state.output.push(value);
-    print!("{}", value);
 }
 
 //trait StepFunction: Fn(&mut Vec<i32>, usize, i32) -> Option<usize>;
 
-pub fn perform_step(state: &mut State, op_map: &HashMap<i32, Box<dyn Fn(&mut State, i32) -> Option<usize>>>) -> bool {
+fn perform_step(state: &mut State, op_map: &HashMap<i32, Box<dyn Fn(&mut State, i32) -> Option<usize>>>) -> bool {
     let op = state.mem[state.ip] % 100;
     let flags = state.mem[state.ip] / 100;
 //    println!("before {},{} {:?}", op, flags, state.mem);
@@ -99,14 +99,17 @@ fn run_until_halt(memory: Vec<i32>, mut input_buffer: Vec<i32>) -> State {
     let op_map = get_op_map();
 
     while perform_step(&mut state, &op_map) {}
-    println!();
-    println!("result: {}", state.mem[0]);
     return state;
 }
 
 pub fn run(memory: Vec<i32>, input_buffer: Vec<i32>) -> Vec<i32> {
     let state = run_until_halt(memory, input_buffer);
     return state.output;
+}
+
+pub fn read_program(file: String) -> Vec<i32> {
+    let line = fs::read_to_string(file).unwrap();
+    line.split(",").map(|x| x.trim()).map(|x| x.parse().unwrap()).collect()
 }
 
 #[cfg(test)]
