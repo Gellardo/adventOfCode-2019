@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-raw = [ l.strip() for l in open('day02').readlines()]
+raw = [l.strip() for l in open('inputs/day02').readlines()]
 program_in = list(map(lambda x: [ int(y) for y in x.split(",")], raw))[0]
 
 print([ x for x in program_in])
