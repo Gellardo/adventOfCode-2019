@@ -69,13 +69,22 @@ fn handle_flags_state(state: &State, pos: u32, flags: i32) -> i32 {
 fn handle_flags(memory: &VirtMem, ip: usize, base: usize, pos: u32, flags: i32) -> i32 {
     let positional = flags / 10i32.pow(pos - 1) % 10;
     if positional == 0 {
+        trace!("read memory[memory[{} + {}]] = memory[{}] = {}", ip, pos, memory[ip + pos as usize], memory[memory[ip + pos as usize] as usize]);
         return memory[memory[ip + pos as usize] as usize];
     } else if positional == 1 {
         // immediate
+        trace!("read memory[{} + {}] =  {}", ip, pos as usize, memory[ip + pos as usize]);
         return memory[ip + pos as usize];
     } else if positional == 2 {
         // relative to base
-        return memory[base + pos as usize];
+        let delta_base = memory[ip + pos as usize];
+        if delta_base < 0 {
+            trace!("read memory[{} + memory[{} + {}]] =  memory[{} + {}] = {}", base, ip, pos as usize, base, delta_base, memory[base - (-delta_base) as usize]);
+            return memory[base - (-delta_base) as usize];
+        } else {
+            trace!("read memory[{} + memory[{} + {}]] =  memory[{} + {}] = {}", base, ip, pos as usize, base, delta_base, memory[base + delta_base as usize]);
+            return memory[base + delta_base as usize];
+        }
     } else {
         panic!("flag not implemented: from memory[{}] with flag {}", ip + pos as usize, positional);
     }
@@ -167,11 +176,12 @@ mod tests {
             assert_eq!(state.output[0], 0);
         }
     }
-//    #[test]
-//    fn day9_tests() {
-//        let inputs = vec![vec![109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99], ];
-//        assert_eq!(run_until_halt(inputs[0].clone(), vec![]).output, inputs[0]);
-//    }
+
+    #[test]
+    fn day9_tests() {
+        let inputs = vec![vec![109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99], ];
+        assert_eq!(run_until_halt(inputs[0].clone(), vec![]).output, inputs[0]);
+    }
 
     #[test]
     fn jumps() {
