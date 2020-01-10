@@ -1,6 +1,5 @@
 extern crate advent_of_code;
 
-use std::fs;
 use std::ops::RangeInclusive;
 
 use advent_of_code::intcode;
@@ -26,7 +25,7 @@ fn max_thrust(mem: Vec<i32>) -> (Vec<i32>, i32) {
     max_thrust_range(mem, 0..=4, false)
 }
 
-fn max_thrust_range(mem: Vec<i32>, range: RangeInclusive<i32>, looping: bool) -> (Vec<i32>, i32) {
+fn max_thrust_range(mem: Vec<i32>, _range: RangeInclusive<i32>, looping: bool) -> (Vec<i32>, i32) {
     let mut max = 0;
     let mut input = vec![0, 0, 0, 0, 0];
     let range = 0..=4;
