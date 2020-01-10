@@ -37,10 +37,11 @@ impl IndexMut<usize> for VirtMem {
 
 impl From<Vec<i32>> for VirtMem {
     fn from(inp: Vec<i32>) -> Self {
-        let mut hmap = HashMap::new();
-        let page = [0; 100];
-        hmap.insert(0, page);
-        return VirtMem { pages: hmap };
+        let mut mem = VirtMem { pages: HashMap::new() };
+        for (idx, value) in inp.iter().enumerate() {
+            mem[idx] = *value;
+        }
+        mem
     }
 }
 
@@ -69,5 +70,25 @@ mod tests {
         // write/read value at an offset
         mem[10] = 2;
         assert_eq!(mem[10], 2);
+    }
+
+    #[test]
+    fn init_memory() {
+        let starting = vec![0, 1, 2, 3];
+        let mem = VirtMem::from(starting.clone());
+        for (idx, _) in starting.iter().enumerate() {
+            println!("checking position {}", idx);
+            assert_eq!(mem[idx], starting[idx] as i32)
+        }
+    }
+
+    #[test]
+    fn large_memory() {
+        let starting = [12; 1000].to_vec();
+        let mem = VirtMem::from(starting.clone());
+        for (idx, _) in starting.iter().enumerate() {
+            assert_eq!(mem[idx], starting[idx] as i32,
+                       "mem[{}]={} != {}(expected)", idx, mem[idx], starting[idx])
+        }
     }
 }
