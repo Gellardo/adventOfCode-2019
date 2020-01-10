@@ -5,7 +5,7 @@ pub struct VirtMem {
     pages: HashMap<usize, [i32; 100]>
 }
 
-fn get_indices(index: usize) -> (usize, usize){
+fn get_indices(index: usize) -> (usize, usize) {
     return (index / 100, index % 100);
 }
 
@@ -13,7 +13,6 @@ impl Index<usize> for VirtMem {
     type Output = i32;
 
     fn index(&self, index: usize) -> &Self::Output {
-        println!("start Index");
         let (page_index, page_offset) = get_indices(index);
         let page = &self.pages.get(&page_index);
         if page.is_none() {
@@ -25,12 +24,10 @@ impl Index<usize> for VirtMem {
 
 impl IndexMut<usize> for VirtMem {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-
-        println!("start IndexMut");
         let (page_index, page_offset) = get_indices(index);
         if !self.pages.contains_key(&page_index) {
-            println!("page fault");
-            self.pages.insert(page_index, [0;100]);
+            debug!("page fault, creating page {}", page_index);
+            self.pages.insert(page_index, [0; 100]);
         }
         let page = self.pages.get_mut(&page_index);
 
@@ -58,7 +55,7 @@ mod tests {
         assert_eq!(mem[0], 0);
         assert_eq!(mem[1000], 0);
         assert_eq!(mem.pages.len(), 0);
-        println!("Finished read only");
+        println!("Finished read only test");
 
         // allocate pages on write
         mem[0] = 1;
