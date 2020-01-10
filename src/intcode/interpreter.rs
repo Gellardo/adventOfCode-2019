@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::convert::TryInto;
-use std::fs;
 
 use crate::intcode::virtual_memory::VirtMem;
 
@@ -57,7 +56,7 @@ fn get_op_map() -> HashMap<i32, Box<dyn Fn(&mut State, i32) -> Option<usize>>> {
     })); // eq
     op_map.insert(9, Box::new(|state, flags| {
         state.relative_base = state.relative_base + handle_flags_state(&state, 1, flags) as usize;
-        Some(1)
+        Some(2)
     })); // set base pointer
     op_map.insert(99, Box::new(|_, _| None));
     return op_map;
@@ -91,6 +90,7 @@ fn input(state: &mut State) -> i32 {
 }
 
 fn output(state: &mut State, value: i32) {
+    trace!("output: {}", value);
     state.output.push(value);
 }
 
@@ -100,11 +100,14 @@ fn perform_step(state: &mut State, op_map: &HashMap<i32, Box<dyn Fn(&mut State, 
     let op = state.mem[state.ip] % 100;
     let flags = state.mem[state.ip] / 100;
 //    println!("before {},{} {:?}", op, flags, state.mem);
-    let delta_ip = op_map[&op](state, flags);
-//    println!("after {:?}", state.mem);
+    trace!("perform op @{}: {}", state.ip, op);
+    let op = op_map.get(&op).expect(&("Unknown op ".to_owned() + &op.to_string()));
+    let delta_ip = op(state, flags);
     if delta_ip.is_none() {
         return false; // break
     }
+    trace!("used up {} of [{},{},{},{}]", delta_ip.unwrap(), state.mem[state.ip],
+           state.mem[state.ip + 1], state.mem[state.ip + 2], state.mem[state.ip + 3]);
     state.ip += delta_ip.unwrap();
     return true; // continue
 }
@@ -135,10 +138,10 @@ mod tests {
 
     #[test]
     fn parameter_handling() {
-        let input = vec![-1, 0, 3, 2, 4, 8, 9, 10];
-//        assert_eq!(handle_flags(&input, 1, 0, 1, 10), 2);
-//        assert_eq!(handle_flags(&input, 1, 0, 2, 10), 2);
-//        assert_eq!(handle_flags(&input, 1, 0, 2, 20), 3);
+        let input = VirtMem::from(vec![-1, 0, 3, 2, 4, 8, 9, 10]);
+        assert_eq!(handle_flags(&input, 1, 0, 1, 10), 2);
+        assert_eq!(handle_flags(&input, 1, 0, 2, 10), 2);
+        assert_eq!(handle_flags(&input, 1, 0, 2, 20), 3);
     }
 
     #[test]
