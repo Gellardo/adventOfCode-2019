@@ -1,6 +1,6 @@
 use std::fs;
 
-fn checksum(line: &String, size: usize) -> (i32, i32) {
+fn checksum(line: &String, size: usize) -> (i64, i64) {
     let line_b = line.as_bytes();
     let mut image: [char; 25*6] = ['8'; 25*6];
     let mut min_z = 2000000000;

@@ -4,13 +4,13 @@ use std::ops::RangeInclusive;
 
 use advent_of_code::intcode;
 
-fn run_amplifier(mem: Vec<i32>, phase_setting: i32, mut input: Vec<i32>) -> Vec<i32> {
+fn run_amplifier(mem: Vec<i64>, phase_setting: i64, mut input: Vec<i64>) -> Vec<i64> {
     input.insert(0, phase_setting);
     let output = intcode::run(mem, input);
     return output;
 }
 
-fn run_amplifiers(mem: Vec<i32>, phase_settings: Vec<i32>, looping: bool) -> i32 {
+fn run_amplifiers(mem: Vec<i64>, phase_settings: Vec<i64>, looping: bool) -> i64 {
     if !looping {
         let mut input = vec![0];
         for phase_setting in phase_settings {
@@ -21,11 +21,11 @@ fn run_amplifiers(mem: Vec<i32>, phase_settings: Vec<i32>, looping: bool) -> i32
     0 // not implemented
 }
 
-fn max_thrust(mem: Vec<i32>) -> (Vec<i32>, i32) {
+fn max_thrust(mem: Vec<i64>) -> (Vec<i64>, i64) {
     max_thrust_range(mem, 0..=4, false)
 }
 
-fn max_thrust_range(mem: Vec<i32>, _range: RangeInclusive<i32>, looping: bool) -> (Vec<i32>, i32) {
+fn max_thrust_range(mem: Vec<i64>, _range: RangeInclusive<i64>, looping: bool) -> (Vec<i64>, i64) {
     let mut max = 0;
     let mut input = vec![0, 0, 0, 0, 0];
     let range = 0..=4;

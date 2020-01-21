@@ -1,8 +1,4 @@
-use std::collections::HashSet;
-
-//use std::collections::Vec;
-
-fn num2vec(mut num: i32) -> Vec<i32> {
+fn num2vec(mut num: i64) -> Vec<i64> {
     let mut v = Vec::new();
     while num > 0 {
         v.push(num % 10);
@@ -12,7 +8,7 @@ fn num2vec(mut num: i32) -> Vec<i32> {
     return v;
 }
 
-fn vec2num(vec: &Vec<i32>) -> i32 {
+fn vec2num(vec: &Vec<i64>) -> i64 {
     let mut num = 0;
     for d in vec {
         num *= 10;
@@ -21,7 +17,7 @@ fn vec2num(vec: &Vec<i32>) -> i32 {
     return num;
 }
 
-fn iterate_possible_passwords<F>(num_digits: i32, digits: &mut Vec<i32>, correct: &F) -> i32 where F: Fn(Vec<i32>) -> bool {
+fn iterate_possible_passwords<F>(num_digits: i64, digits: &mut Vec<i64>, correct: &F) -> i64 where F: Fn(Vec<i64>) -> bool {
     if num_digits <= 0 {
         if correct(digits.to_vec()) {
             println!("{:?}", vec2num(digits));
@@ -38,7 +34,7 @@ fn iterate_possible_passwords<F>(num_digits: i32, digits: &mut Vec<i32>, correct
     return sum;
 }
 
-fn correct_1(digits: &Vec<i32>) -> bool {
+fn correct_1(digits: &Vec<i64>) -> bool {
     let mut last = 0;
     let mut double = false;
     for d in digits {

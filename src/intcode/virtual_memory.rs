@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::ops::{Index, IndexMut};
 
 pub struct VirtMem {
-    pages: HashMap<usize, [i32; 100]>
+    pages: HashMap<usize, [i64; 100]>
 }
 
 fn get_indices(index: usize) -> (usize, usize) {
@@ -10,7 +10,7 @@ fn get_indices(index: usize) -> (usize, usize) {
 }
 
 impl Index<usize> for VirtMem {
-    type Output = i32;
+    type Output = i64;
 
     fn index(&self, index: usize) -> &Self::Output {
         let (page_index, page_offset) = get_indices(index);
@@ -35,8 +35,8 @@ impl IndexMut<usize> for VirtMem {
     }
 }
 
-impl From<Vec<i32>> for VirtMem {
-    fn from(inp: Vec<i32>) -> Self {
+impl From<Vec<i64>> for VirtMem {
+    fn from(inp: Vec<i64>) -> Self {
         let mut mem = VirtMem { pages: HashMap::new() };
         for (idx, value) in inp.iter().enumerate() {
             mem[idx] = *value;
@@ -78,7 +78,7 @@ mod tests {
         let mem = VirtMem::from(starting.clone());
         for (idx, _) in starting.iter().enumerate() {
             println!("checking position {}", idx);
-            assert_eq!(mem[idx], starting[idx] as i32)
+            assert_eq!(mem[idx], starting[idx] as i64)
         }
     }
 
@@ -87,7 +87,7 @@ mod tests {
         let starting = [12; 1000].to_vec();
         let mem = VirtMem::from(starting.clone());
         for (idx, _) in starting.iter().enumerate() {
-            assert_eq!(mem[idx], starting[idx] as i32,
+            assert_eq!(mem[idx], starting[idx] as i64,
                        "mem[{}]={} != {}(expected)", idx, mem[idx], starting[idx])
         }
     }

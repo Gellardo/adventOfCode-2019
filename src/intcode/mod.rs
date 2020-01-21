@@ -2,11 +2,11 @@ mod virtual_memory;
 mod interpreter;
 use std::fs;
 
-pub fn run(memory: Vec<i32>, input_buffer: Vec<i32>) -> Vec<i32> {
+pub fn run(memory: Vec<i64>, input_buffer: Vec<i64>) -> Vec<i64> {
     interpreter::run(memory, input_buffer)
 }
 
-pub fn read_program(file: String) -> Vec<i32> {
+pub fn read_program(file: String) -> Vec<i64> {
     let line = fs::read_to_string(file).unwrap();
     line.split(",").map(|x| x.trim()).map(|x| x.parse().unwrap()).collect()
 }

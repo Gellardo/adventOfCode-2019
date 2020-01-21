@@ -7,12 +7,12 @@ pub struct State {
     mem: VirtMem,
     ip: usize,
     relative_base: usize,
-    input: Vec<i32>,
-    output: Vec<i32>,
+    input: Vec<i64>,
+    output: Vec<i64>,
 }
 
-fn get_op_map() -> HashMap<i32, Box<dyn Fn(&mut State, i32) -> Option<usize>>> {
-    let mut op_map: HashMap<i32, Box<dyn Fn(&mut State, i32) -> Option<usize>>> = HashMap::new();
+fn get_op_map() -> HashMap<i64, Box<dyn Fn(&mut State, i64) -> Option<usize>>> {
+    let mut op_map: HashMap<i64, Box<dyn Fn(&mut State, i64) -> Option<usize>>> = HashMap::new();
     op_map.insert(1, Box::new(|state, flags| {
         let target = state.mem[state.ip + 3] as usize;
         state.mem[target] = handle_flags_state(&state, 1, flags) + handle_flags_state(&state, 2, flags);
@@ -62,12 +62,12 @@ fn get_op_map() -> HashMap<i32, Box<dyn Fn(&mut State, i32) -> Option<usize>>> {
     return op_map;
 }
 
-fn handle_flags_state(state: &State, pos: u32, flags: i32) -> i32 {
+fn handle_flags_state(state: &State, pos: u32, flags: i64) -> i64 {
     return handle_flags(&state.mem, state.ip, state.relative_base, pos, flags);
 }
 
-fn handle_flags(memory: &VirtMem, ip: usize, base: usize, pos: u32, flags: i32) -> i32 {
-    let positional = flags / 10i32.pow(pos - 1) % 10;
+fn handle_flags(memory: &VirtMem, ip: usize, base: usize, pos: u32, flags: i64) -> i64 {
+    let positional = flags / 10i64.pow(pos - 1) % 10;
     if positional == 0 {
         trace!("read memory[memory[{} + {}]] = memory[{}] = {}", ip, pos, memory[ip + pos as usize], memory[memory[ip + pos as usize] as usize]);
         return memory[memory[ip + pos as usize] as usize];
@@ -90,7 +90,7 @@ fn handle_flags(memory: &VirtMem, ip: usize, base: usize, pos: u32, flags: i32) 
     }
 }
 
-fn input(state: &mut State) -> i32 {
+fn input(state: &mut State) -> i64 {
     //let mut line = String::new();
     //let stdin = io::stdin();
     //stdin.lock().read_line(&mut line).expect("Could not read line");
@@ -98,14 +98,14 @@ fn input(state: &mut State) -> i32 {
     return state.input.pop().unwrap();
 }
 
-fn output(state: &mut State, value: i32) {
+fn output(state: &mut State, value: i64) {
     trace!("output: {}", value);
     state.output.push(value);
 }
 
-//trait StepFunction: Fn(&mut Vec<i32>, usize, i32) -> Option<usize>;
+//trait StepFunction: Fn(&mut Vec<i64>, usize, i64) -> Option<usize>;
 
-fn perform_step(state: &mut State, op_map: &HashMap<i32, Box<dyn Fn(&mut State, i32) -> Option<usize>>>) -> bool {
+fn perform_step(state: &mut State, op_map: &HashMap<i64, Box<dyn Fn(&mut State, i64) -> Option<usize>>>) -> bool {
     let op = state.mem[state.ip] % 100;
     let flags = state.mem[state.ip] / 100;
 //    println!("before {},{} {:?}", op, flags, state.mem);
@@ -121,7 +121,7 @@ fn perform_step(state: &mut State, op_map: &HashMap<i32, Box<dyn Fn(&mut State, 
     return true; // continue
 }
 
-fn run_until_halt(memory: Vec<i32>, mut input_buffer: Vec<i32>) -> State {
+fn run_until_halt(memory: Vec<i64>, mut input_buffer: Vec<i64>) -> State {
     input_buffer.reverse();
     let mut state = State {
         mem: VirtMem::from(memory),
@@ -136,7 +136,7 @@ fn run_until_halt(memory: Vec<i32>, mut input_buffer: Vec<i32>) -> State {
     return state;
 }
 
-pub fn run(memory: Vec<i32>, input_buffer: Vec<i32>) -> Vec<i32> {
+pub fn run(memory: Vec<i64>, input_buffer: Vec<i64>) -> Vec<i64> {
     let state = run_until_halt(memory, input_buffer);
     return state.output;
 }

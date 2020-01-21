@@ -8,7 +8,7 @@ use std::fs;
  * So we just walk the edges backwards until there are no more options and count the steps.
  * Use basic caching to improve the runtime.
  */
-fn find_root_caching(edges: &Vec<Vec<String>>, val: &String, known_dist: &HashMap<String, i32>) -> i32 {
+fn find_root_caching(edges: &Vec<Vec<String>>, val: &String, known_dist: &HashMap<String, i64>) -> i64 {
     let mut steps = 0;
     let mut current = val;
     {
@@ -36,8 +36,8 @@ fn find_root_caching(edges: &Vec<Vec<String>>, val: &String, known_dist: &HashMa
  * Walk from both points to the source, until we find an intersection.
  * Since we work on a tree, this is the shortest path
  */
-fn find_min_transits(edges: &Vec<Vec<String>>, from: String, to: String) -> i32 {
-    let mut known_transits: HashMap<String, i32> = HashMap::new();
+fn find_min_transits(edges: &Vec<Vec<String>>, from: String, to: String) -> i64 {
+    let mut known_transits: HashMap<String, i64> = HashMap::new();
     let mut steps = 0;
     let mut current = &from;
     {
@@ -74,20 +74,20 @@ fn find_min_transits(edges: &Vec<Vec<String>>, from: String, to: String) -> i32 
     known_transits[current] + steps - 2
 }
 
-fn count_all_steps_to_root(edges: &Vec<Vec<String>>) -> (i32, i32) {
+fn count_all_steps_to_root(edges: &Vec<Vec<String>>) -> (i64, i64) {
     let nodes: HashSet<String> = edges.iter()
         .filter(|x| x.len() > 1)
         .flat_map(|x| x.iter().map(|y| y.to_string()))
         .collect();
     let mut steps = 0;
     let num_nodes = nodes.len();
-    let mut known_distances: HashMap<String, i32> = HashMap::new();
+    let mut known_distances: HashMap<String, i64> = HashMap::new();
     for node in nodes {
         let node_steps = find_root_caching(&edges, &node, &mut known_distances);
         known_distances.insert(node, node_steps);
         steps += node_steps;
     }
-    (steps, steps - num_nodes as i32)
+    (steps, steps - num_nodes as i64)
 }
 
 fn process_input(input: String) -> Vec<Vec<String>> {
