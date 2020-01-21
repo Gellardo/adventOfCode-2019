@@ -14,17 +14,17 @@ pub struct State {
 fn get_op_map() -> HashMap<i64, Box<dyn Fn(&mut State, i64) -> Option<usize>>> {
     let mut op_map: HashMap<i64, Box<dyn Fn(&mut State, i64) -> Option<usize>>> = HashMap::new();
     op_map.insert(1, Box::new(|state, flags| {
-        let target = state.mem[state.ip + 3] as usize;
+        let target = decode_parameter_flags(&state.mem, state.ip, state.relative_base, 3, flags);
         state.mem[target] = handle_flags_state(&state, 1, flags) + handle_flags_state(&state, 2, flags);
         return Some(4);
     })); // add
     op_map.insert(2, Box::new(|state, flags| {
-        let target = state.mem[state.ip + 3] as usize;
+        let target = decode_parameter_flags(&state.mem, state.ip, state.relative_base, 3, flags);
         state.mem[target] = handle_flags_state(&state, 1, flags) * handle_flags_state(&state, 2, flags);
         return Some(4);
     })); // mult
-    op_map.insert(3, Box::new(|state, _| {
-        let target = state.mem[state.ip + 1] as usize;
+    op_map.insert(3, Box::new(|state, flags| {
+        let target = decode_parameter_flags(&state.mem, state.ip, state.relative_base, 1, flags);
         state.mem[target] = input(state);
         Some(2)
     })); //input
@@ -45,17 +45,22 @@ fn get_op_map() -> HashMap<i64, Box<dyn Fn(&mut State, i64) -> Option<usize>>> {
         } else { Some(3) }
     })); //jump-false
     op_map.insert(7, Box::new(|state, flags| {
-        let target = state.mem[state.ip + 3] as usize;
+        let target = decode_parameter_flags(&state.mem, state.ip, state.relative_base, 3, flags);
         state.mem[target] = if handle_flags_state(&state, 1, flags) < handle_flags_state(&state, 2, flags) { 1 } else { 0 };
         Some(4)
     })); // less than
     op_map.insert(8, Box::new(|state, flags| {
-        let target = state.mem[state.ip + 3] as usize;
+        let target = decode_parameter_flags(&state.mem, state.ip, state.relative_base, 3, flags);
         state.mem[target] = if handle_flags_state(&state, 1, flags) == handle_flags_state(&state, 2, flags) { 1 } else { 0 };
         Some(4)
     })); // eq
     op_map.insert(9, Box::new(|state, flags| {
-        state.relative_base = state.relative_base + handle_flags_state(&state, 1, flags) as usize;
+        let delta = handle_flags_state(&state, 1, flags);
+        if delta < 0 {
+            state.relative_base = state.relative_base - (-delta) as usize;
+        } else {
+            state.relative_base = state.relative_base + delta as usize;
+        }
         Some(2)
     })); // set base pointer
     op_map.insert(99, Box::new(|_, _| None));
@@ -67,23 +72,28 @@ fn handle_flags_state(state: &State, pos: u32, flags: i64) -> i64 {
 }
 
 fn handle_flags(memory: &VirtMem, ip: usize, base: usize, pos: u32, flags: i64) -> i64 {
+    return memory[decode_parameter_flags(memory, ip, base, pos, flags)];
+}
+
+fn decode_parameter_flags(memory: &VirtMem, ip: usize, base: usize, pos: u32, flags: i64) -> usize {
+    // return the correct address to refer to
     let positional = flags / 10i64.pow(pos - 1) % 10;
     if positional == 0 {
-        trace!("read memory[memory[{} + {}]] = memory[{}] = {}", ip, pos, memory[ip + pos as usize], memory[memory[ip + pos as usize] as usize]);
-        return memory[memory[ip + pos as usize] as usize];
+        trace!("memory[memory[{} + {}]] = memory[{}] = {}", ip, pos, memory[ip + pos as usize], memory[memory[ip + pos as usize] as usize]);
+        return memory[ip + pos as usize] as usize;
     } else if positional == 1 {
         // immediate
-        trace!("read memory[{} + {}] =  {}", ip, pos as usize, memory[ip + pos as usize]);
-        return memory[ip + pos as usize];
+        trace!("memory[{} + {}] =  {}", ip, pos as usize, memory[ip + pos as usize]);
+        return ip + pos as usize;
     } else if positional == 2 {
         // relative to base
         let delta_base = memory[ip + pos as usize];
         if delta_base < 0 {
-            trace!("read memory[{} + memory[{} + {}]] =  memory[{} + {}] = {}", base, ip, pos as usize, base, delta_base, memory[base - (-delta_base) as usize]);
-            return memory[base - (-delta_base) as usize];
+            trace!("memory[{} + memory[{} + {}]] =  memory[{} + {}] = {}", base, ip, pos as usize, base, delta_base, memory[base - (-delta_base) as usize]);
+            return base - (-delta_base) as usize;
         } else {
-            trace!("read memory[{} + memory[{} + {}]] =  memory[{} + {}] = {}", base, ip, pos as usize, base, delta_base, memory[base + delta_base as usize]);
-            return memory[base + delta_base as usize];
+            trace!("memory[{} + memory[{} + {}]] =  memory[{} + {}] = {}", base, ip, pos as usize, base, delta_base, memory[base + delta_base as usize]);
+            return base + delta_base as usize;
         }
     } else {
         panic!("flag not implemented: from memory[{}] with flag {}", ip + pos as usize, positional);

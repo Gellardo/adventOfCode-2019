@@ -53,9 +53,9 @@ mod tests {
             assert_eq!(output[0], 0);
         }
     }
-////    #[test]
-////    fn day9_tests() {
-////        let inputs = vec![vec![109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99], ];
-////        assert_eq!(run_until_halt(inputs[0].clone(), vec![]).output, inputs[0]);
-////    }
+    #[test]
+    fn day9_tests() {
+        let inputs = vec![vec![109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99], ];
+        assert_eq!(interpreter::run(inputs[0].clone(), vec![]), inputs[0]);
+    }
 }
