@@ -13,7 +13,6 @@ fn run_program(input: i64) -> Vec<i64> {
 }
 
 fn main() {
-//    env_logger::init();
     env_logger::from_env(Env::default().default_filter_or("info")).init();
 
     let out1 = run_program(1);

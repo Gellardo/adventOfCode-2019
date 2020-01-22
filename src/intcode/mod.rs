@@ -1,6 +1,7 @@
-mod virtual_memory;
-mod interpreter;
 use std::fs;
+
+mod interpreter;
+mod virtual_memory;
 
 pub fn run(memory: Vec<i64>, input_buffer: Vec<i64>) -> Vec<i64> {
     interpreter::run(memory, input_buffer)
@@ -8,9 +9,11 @@ pub fn run(memory: Vec<i64>, input_buffer: Vec<i64>) -> Vec<i64> {
 
 pub fn read_program(file: String) -> Vec<i64> {
     let line = fs::read_to_string(file).unwrap();
-    line.split(",").map(|x| x.trim()).map(|x| x.parse().unwrap()).collect()
+    line.split(",")
+        .map(|x| x.trim())
+        .map(|x| x.parse().unwrap())
+        .collect()
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -53,9 +56,12 @@ mod tests {
             assert_eq!(output[0], 0);
         }
     }
+
     #[test]
     fn day9_tests() {
-        let inputs = vec![vec![109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99], ];
+        let inputs = vec![vec![
+            109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99,
+        ]];
         assert_eq!(interpreter::run(inputs[0].clone(), vec![]), inputs[0]);
     }
 }
